@@ -27,4 +27,8 @@ RUN dotnet publish "./eCommerce.Orderservice.csproj" -c $BUILD_CONFIGURATION -o 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+ENV MONGO_HOST=localhost
+ENV MONGO_PORT=27017
+ENV userMicroserviceBaseUrl=localhost
+ENV userMicroservicePort=9090
 ENTRYPOINT ["dotnet", "eCommerce.Orderservice.dll"]
