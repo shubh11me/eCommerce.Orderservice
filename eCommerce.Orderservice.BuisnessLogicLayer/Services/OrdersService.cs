@@ -92,7 +92,7 @@ public class OrdersService : IOrdersService
         }
 
         OrderResponse addedOrderResponse = _mapper.Map<OrderResponse>(addedOrder); //Map addedOrder ('Order' type) into 'OrderResponse' type (it invokes OrderToOrderResponseMappingProfile).
-
+        FetchProductDetailsInOrderReponse(ref addedOrderResponse);
         return addedOrderResponse;
     }
 
@@ -150,7 +150,7 @@ public class OrdersService : IOrdersService
         }
 
         OrderResponse updatedOrderResponse = _mapper.Map<OrderResponse>(updatedOrder); //Map updatedOrder ('Order' type) into 'OrderResponse' type (it invokes OrderToOrderResponseMappingProfile).
-
+        FetchProductDetailsInOrderReponse(ref updatedOrderResponse);
         return updatedOrderResponse;
     }
 
@@ -178,6 +178,7 @@ public class OrdersService : IOrdersService
             return null;
 
         OrderResponse orderResponse = _mapper.Map<OrderResponse>(order);
+        FetchProductDetailsInOrderReponse(ref orderResponse);
         return orderResponse;
     }
 
@@ -188,7 +189,14 @@ public class OrdersService : IOrdersService
 
 
         IEnumerable<OrderResponse?> orderResponses = _mapper.Map<IEnumerable<OrderResponse>>(orders);
-        return orderResponses.ToList();
+        return orderResponses.Select(temp =>
+        {
+            if (temp != null)
+            {
+                FetchProductDetailsInOrderReponse(ref temp);
+            }
+            return temp;
+        }).ToList();
     }
 
 
@@ -196,6 +204,33 @@ public class OrdersService : IOrdersService
     {
         IEnumerable<Order?> orders = await _ordersRepository.GetOrders();
         IEnumerable<OrderResponse?> orderResponses = _mapper.Map<IEnumerable<OrderResponse>>(orders);
-        return orderResponses.ToList();
+        return orderResponses.Select(temp =>
+        {
+            if (temp != null)
+            {
+                FetchProductDetailsInOrderReponse(ref temp);
+            }
+            return temp;
+        }).ToList();
+    }
+
+    private void FetchProductDetailsInOrderReponse(ref OrderResponse orderResponse)
+    {
+        for (int i = 0; i < orderResponse.OrderItems.Count; i++)
+        {
+            try
+            {
+                OrderItemResponse orderItem = orderResponse.OrderItems[i];
+                ProductResponse product = _productMicroserviceClient.GetProductByProductID(orderItem.ProductID).Result;
+                if (product is null) continue;
+                _mapper.Map<ProductResponse,OrderItemResponse>(product, orderResponse.OrderItems[i]);
+            }
+            catch(Exception ex)
+            {
+                //Logger
+                continue;
+            }
+
+        }
     }
 }
