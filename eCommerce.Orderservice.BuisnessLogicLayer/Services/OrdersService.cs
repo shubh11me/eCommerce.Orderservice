@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BuisnessLogicLayer.DTO;
 using eCommerce.Orderservice.BuisnessLogicLayer.DTO;
 using eCommerce.Orderservice.BuisnessLogicLayer.HttpClients;
 using eCommerce.Orderservice.BuisnessLogicLayer.ServiceContracts;
@@ -19,8 +20,9 @@ public class OrdersService : IOrdersService
     private readonly IMapper _mapper;
     private IOrdersRepository _ordersRepository;
     private readonly UserMicroserviceClient _userMicroserviceClient;
+    private readonly ProductMicroserviceClient _productMicroserviceClient;
 
-    public OrdersService(IOrdersRepository ordersRepository, IMapper mapper, IValidator<OrderAddRequest> orderAddRequestValidator, IValidator<OrderItemAddRequest> orderItemAddRequestValidator, IValidator<OrderUpdateRequest> orderUpdateRequestValidator, IValidator<OrderItemUpdateRequest> orderItemUpdateRequestValidator, UserMicroserviceClient userMicroserviceClient)
+    public OrdersService(IOrdersRepository ordersRepository, IMapper mapper, IValidator<OrderAddRequest> orderAddRequestValidator, IValidator<OrderItemAddRequest> orderItemAddRequestValidator, IValidator<OrderUpdateRequest> orderUpdateRequestValidator, IValidator<OrderItemUpdateRequest> orderItemUpdateRequestValidator, UserMicroserviceClient userMicroserviceClient,ProductMicroserviceClient productMicroserviceClient)
     {
         _orderAddRequestValidator = orderAddRequestValidator;
         _orderItemAddRequestValidator = orderItemAddRequestValidator;
@@ -29,13 +31,13 @@ public class OrdersService : IOrdersService
         _mapper = mapper;
         _ordersRepository = ordersRepository;
         _userMicroserviceClient = userMicroserviceClient;
+        _productMicroserviceClient = productMicroserviceClient;
     }
 
 
     public async Task<OrderResponse?> AddOrder(OrderAddRequest orderAddRequest)
     {
         UserDTO? user = await _userMicroserviceClient.GetUserByUserId(orderAddRequest.UserID);
-
         //Check for null parameter
         if (orderAddRequest == null)
         {

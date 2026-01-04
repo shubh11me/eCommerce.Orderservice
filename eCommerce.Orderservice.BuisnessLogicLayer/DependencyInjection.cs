@@ -14,6 +14,9 @@ namespace eCommerce.Orderservice.BuisnessLogicLayer
         public static IServiceCollection AddBLLayer(this IServiceCollection services,IConfiguration configuration)
         {
             services.AddHttpClient<UserMicroserviceClient>(options => options.BaseAddress = new Uri($"http://{configuration["userMicroserviceBaseUrl"]}:{configuration["userMicroservicePort"]}")); ;
+
+            services.AddHttpClient<ProductMicroserviceClient>(options => options.BaseAddress = new Uri($"http://{configuration["productMicroserviceBaseUrl"]}:{configuration["productMicroservicePort"]}")); ;
+
             services.AddScoped<IOrdersService, OrdersService>();
             return services;
         }

@@ -5,15 +5,19 @@ services:
       dockerfile: eCommerce.Orderservice/Dockerfile
     ports:
     - "7070:8080"
+    - "7071:8081"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - MONGO_HOST=mongo-container
       - MONGO_PORT=27017
-      - userMicroserviceBaseUrl=localhost
-      - userMicroservicePort=9090
+      - userMicroserviceBaseUrl=users-microservice
+      - userMicroservicePort=8080
+      - productMicroserviceBaseUrl=products-microservice
+      - productMicroservicePort=8080
     networks:
-      - orders-service-network
+      - orders-mongodb-network
+      - ecommerce-network
   mongo-container:
    image: mongo:latest
    ports:
@@ -21,7 +25,7 @@ services:
    volumes:
     - ../mongodb-init:/docker-entrypoint-initdb.d
    networks:
-    - orders-service-network
+    - orders-mongodb-network
   mysql-container:
     image: mysql:8.3.0
     environment:
@@ -31,7 +35,7 @@ services:
     volumes:
       - ../mysql-init:/docker-entrypoint-initdb.d
     networks:
-      - orders-service-network
+      - products-mysql-network
     hostname: mysql-host-productservice
 
   products-microservice:
@@ -43,9 +47,10 @@ services:
       MYSQL_DB: ecommerceproductsdatabase
       MYSQL_USER: root
     ports:
-      - "8080:8080"
+      - "5050:8080"
     networks:
-      - orders-service-network
+      - products-mysql-network
+      - ecommerce-network
   postgres-container:
    image: postgres:16.1
    environment:
@@ -57,7 +62,7 @@ services:
    volumes:
    - ../postgres-init:/docker-entrypoint-initdb.d
    networks:
-   - orders-service-network
+   - users-postgres-network
 
   users-microservice:
    image: shubh11me/ecommerce.userservice:latest
@@ -65,10 +70,17 @@ services:
    - POSTGRES_HOST=postgres-container
    - POSTGRES_PASSWORD=admin
    ports:
-   - "9090:8080"
+   - "6060:8080"
    networks:
-   - orders-service-network  
+   - users-postgres-network
+   - ecommerce-network
 networks:
-  orders-service-network:
-    driver: bridge
+ orders-mongodb-network:
+  driver: bridge
+ products-mysql-network:
+  driver: bridge
+ users-postgres-network:
+  driver: bridge
+ ecommerce-network:
+  driver: bridge
     

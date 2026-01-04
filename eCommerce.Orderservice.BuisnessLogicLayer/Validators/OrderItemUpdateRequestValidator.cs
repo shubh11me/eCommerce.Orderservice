@@ -1,15 +1,16 @@
 ﻿using eCommerce.Orderservice.BuisnessLogicLayer.DTO;
+using eCommerce.Orderservice.BuisnessLogicLayer.HttpClients;
 using FluentValidation;
 
 namespace eCommerce.Orderservice.BuisnessLogicLayer.Validators;
 
 public class OrderItemUpdateRequestValidator : AbstractValidator<OrderItemUpdateRequest>
 {
-  public OrderItemUpdateRequestValidator()
+  public OrderItemUpdateRequestValidator(ProductMicroserviceClient microserviceClient)
   {
     //ProductID
     RuleFor(temp => temp.ProductID)
-      .NotEmpty().WithErrorCode("Product ID can't be blank");
+      .ValidateProductID(microserviceClient);
 
     //UnitPrice
     RuleFor(temp => temp.UnitPrice)

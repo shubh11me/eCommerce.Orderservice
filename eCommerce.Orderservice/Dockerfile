@@ -31,4 +31,6 @@ ENV MONGO_HOST=localhost
 ENV MONGO_PORT=27017
 ENV userMicroserviceBaseUrl=localhost
 ENV userMicroservicePort=9090
+ENV productMicroserviceBaseUrl=localhost
+ENV productMicroservicePort=9090
 ENTRYPOINT ["dotnet", "eCommerce.Orderservice.dll"]
