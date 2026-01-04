@@ -93,6 +93,7 @@ public class OrdersService : IOrdersService
 
         OrderResponse addedOrderResponse = _mapper.Map<OrderResponse>(addedOrder); //Map addedOrder ('Order' type) into 'OrderResponse' type (it invokes OrderToOrderResponseMappingProfile).
         FetchProductDetailsInOrderReponse(ref addedOrderResponse);
+        loadUserDetailsInOrderResponse(ref addedOrderResponse);
         return addedOrderResponse;
     }
 
@@ -151,6 +152,7 @@ public class OrdersService : IOrdersService
 
         OrderResponse updatedOrderResponse = _mapper.Map<OrderResponse>(updatedOrder); //Map updatedOrder ('Order' type) into 'OrderResponse' type (it invokes OrderToOrderResponseMappingProfile).
         FetchProductDetailsInOrderReponse(ref updatedOrderResponse);
+        loadUserDetailsInOrderResponse(ref updatedOrderResponse);
         return updatedOrderResponse;
     }
 
@@ -179,6 +181,7 @@ public class OrdersService : IOrdersService
 
         OrderResponse orderResponse = _mapper.Map<OrderResponse>(order);
         FetchProductDetailsInOrderReponse(ref orderResponse);
+        loadUserDetailsInOrderResponse(ref orderResponse);
         return orderResponse;
     }
 
@@ -194,6 +197,7 @@ public class OrdersService : IOrdersService
             if (temp != null)
             {
                 FetchProductDetailsInOrderReponse(ref temp);
+                loadUserDetailsInOrderResponse(ref temp);
             }
             return temp;
         }).ToList();
@@ -209,6 +213,7 @@ public class OrdersService : IOrdersService
             if (temp != null)
             {
                 FetchProductDetailsInOrderReponse(ref temp);
+                loadUserDetailsInOrderResponse(ref temp);
             }
             return temp;
         }).ToList();
@@ -231,6 +236,21 @@ public class OrdersService : IOrdersService
                 continue;
             }
 
+        }
+    }
+
+    private void loadUserDetailsInOrderResponse(ref OrderResponse orderResponse)
+    {
+        try
+        {
+            UserDTO user = _userMicroserviceClient.GetUserByUserId(orderResponse.UserID).Result;
+            if(user is null) return;
+            _mapper.Map<UserDTO,OrderResponse>(user, orderResponse);
+        }
+        catch (Exception ex)
+        {
+            //Logger
+            return;
         }
     }
 }
