@@ -16,7 +16,8 @@ namespace eCommerce.Orderservice.BuisnessLogicLayer.HttpClients
             HttpResponseMessage response = await _httpClient.GetAsync($"/api/Users/{userId}");
             if (!response.IsSuccessStatusCode)
             {
-              throw new Exception("Failed to fetch user details");
+                //throw new Exception("Failed to fetch user details");
+                return new UserDTO(new Guid("Temprory Unavailable"), "Temprory Unavailable", "Temprory Unavailable", "Temprory Unavailable");
             }
             else
             {
