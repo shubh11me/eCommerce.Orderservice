@@ -15,6 +15,8 @@ services:
       - userMicroservicePort=8080
       - productMicroserviceBaseUrl=products-microservice
       - productMicroservicePort=8080
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     networks:
       - orders-mongodb-network
       - ecommerce-network
@@ -73,6 +75,14 @@ services:
    - "6060:8080"
    networks:
    - users-postgres-network
+   - ecommerce-network
+  redis:
+   image: redis:latest
+   ports:
+   - "6379:6379"
+   volumes:
+   - E:/PROGRAMMING LANGUAGE/C#/Microservices/EcommerceMicroservices/RedisCache:/data
+   networks:
    - ecommerce-network
 networks:
  orders-mongodb-network:
