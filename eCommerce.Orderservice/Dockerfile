@@ -33,4 +33,6 @@ ENV userMicroserviceBaseUrl=localhost
 ENV userMicroservicePort=9090
 ENV productMicroserviceBaseUrl=localhost
 ENV productMicroservicePort=9090
+ENV REDIS_HOST=redis
+ENV REDIS_PORT=6379
 ENTRYPOINT ["dotnet", "eCommerce.Orderservice.dll"]
