@@ -84,6 +84,15 @@ services:
    - E:/PROGRAMMING LANGUAGE/C#/Microservices/EcommerceMicroservices/RedisCache:/data
    networks:
    - ecommerce-network
+  api-gateway:
+   image: apigateway
+   build:
+    context: .
+    dockerfile: APIGateway/Dockerfile
+   ports:
+    - "4321:8080"
+   networks:
+    - ecommerce-network
 networks:
  orders-mongodb-network:
   driver: bridge
