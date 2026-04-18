@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="APIGateway/APIGateway.csproj" Id="5e3d58f8-56fe-4f7d-a872-67523cb98c87" />
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>

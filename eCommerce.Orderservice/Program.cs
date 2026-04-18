@@ -34,7 +34,6 @@ var app = builder.Build();
 app.UseExceptionHandlerMiddleware();
 app.UseRouting();
 app.UseCors();
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSwagger();

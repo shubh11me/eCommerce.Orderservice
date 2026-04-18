@@ -1,0 +1,46 @@
+{
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/gateway/Orders/{url}",
+      "DownstreamPathTemplate": "/api/Orders/{url}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ecommerce.orderservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ],
+      "UpstreamScheme": "http",
+      "DownstreamScheme": "http"
+    },
+    {
+      "UpstreamPathTemplate": "/gateway/Product/{url}",
+      "DownstreamPathTemplate": "/api/Product/{url}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "products-microservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Patch", "Options" ],
+      "UpstreamScheme": "http",
+      "DownstreamScheme": "http"
+    },
+    {
+      "UpstreamPathTemplate": "/gateway/Users/{url}",
+      "DownstreamPathTemplate": "/api/Users/{url}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "users-microservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Patch", "Options" ],
+      "UpstreamScheme": "http",
+      "DownstreamScheme": "http"
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:4321"
+  }
+}

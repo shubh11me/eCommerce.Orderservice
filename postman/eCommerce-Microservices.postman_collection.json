@@ -1,0 +1,278 @@
+{
+  "info": {
+    "_postman_id": "a7c3e9b1-4d2f-4e8a-9c1b-orderservice-gateway",
+    "name": "eCommerce Microservices (Orders + Gateway)",
+    "description": "Requests for the Order API, Ocelot API Gateway, and proxied Product/User services.\n\n**Collection variables**\n- `gatewayUrl` — Ocelot (Docker: port 4321)\n- `ordersServiceUrl` — Order service direct (Docker: 7070; VS profile *http*: 5272)\n- `productsServiceUrl` / `usersServiceUrl` — direct to containers (Docker: 5050 / 6060)\n\n**Gateway paths** mirror `APIGateway/ocelot.json`: `/gateway/Orders`, `/gateway/Product`, `/gateway/Users`.\n\nProduct/User request templates match paths used in `ProductMicroserviceClient` and `UserMicroserviceClient` (`/api/Product/{id}`, `/api/Users/{id}`). Extend those folders if your external services expose more routes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "gatewayUrl", "value": "http://localhost:4321" },
+    { "key": "ordersServiceUrl", "value": "http://localhost:7070" },
+    { "key": "productsServiceUrl", "value": "http://localhost:5050" },
+    { "key": "usersServiceUrl", "value": "http://localhost:6060" },
+    { "key": "orderId", "value": "00000000-0000-0000-0000-000000000001" },
+    { "key": "userId", "value": "00000000-0000-0000-0000-000000000002" },
+    { "key": "productId", "value": "00000000-0000-0000-0000-000000000003" },
+    { "key": "orderDate", "value": "2026-04-12" }
+  ],
+  "item": [
+    {
+      "name": "API Gateway",
+      "item": [
+        {
+          "name": "Orders",
+          "item": [
+            {
+              "name": "Get all orders",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{gatewayUrl}}/gateway/Orders",
+                "description": "Maps to `GET /api/Orders` on the order service."
+              }
+            },
+            {
+              "name": "Get order by order ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{gatewayUrl}}/gateway/Orders/search/orderid/{{orderId}}",
+                "description": "Maps to `GET /api/Orders/search/orderid/{orderID}`."
+              }
+            },
+            {
+              "name": "Get orders by product ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{gatewayUrl}}/gateway/Orders/search/productid/{{productId}}",
+                "description": "Maps to `GET /api/Orders/search/productid/{productID}`."
+              }
+            },
+            {
+              "name": "Get orders by user ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{gatewayUrl}}/gateway/Orders/search/userid/{{userId}}",
+                "description": "Maps to `GET /api/Orders/search/userid/{userID}`."
+              }
+            },
+            {
+              "name": "Get orders by order date",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{gatewayUrl}}/gateway/Orders/search/orderDate/{{orderDate}}",
+                "description": "Maps to `GET /api/Orders/search/orderDate/{orderDate}`. Use a date the API can bind (e.g. `2026-04-12`)."
+              }
+            },
+            {
+              "name": "Create order",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userID\": \"{{userId}}\",\n  \"orderDate\": \"2026-04-12T10:00:00Z\",\n  \"orderItems\": [\n    {\n      \"productID\": \"{{productId}}\",\n      \"unitPrice\": 19.99,\n      \"quantity\": 1\n    }\n  ]\n}\n"
+                },
+                "url": "{{gatewayUrl}}/gateway/Orders",
+                "description": "`OrderAddRequest`: userID, orderDate, orderItems (productID, unitPrice, quantity). User and product must exist in downstream services."
+              }
+            },
+            {
+              "name": "Update order",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"orderID\": \"{{orderId}}\",\n  \"userID\": \"{{userId}}\",\n  \"orderDate\": \"2026-04-12T10:00:00Z\",\n  \"orderItems\": [\n    {\n      \"productID\": \"{{productId}}\",\n      \"unitPrice\": 19.99,\n      \"quantity\": 2\n    }\n  ]\n}\n"
+                },
+                "url": "{{gatewayUrl}}/gateway/Orders/{{orderId}}",
+                "description": "`OrderUpdateRequest`: orderID in URL must match body. Same item shape as create."
+              }
+            },
+            {
+              "name": "Delete order",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{gatewayUrl}}/gateway/Orders/{{orderId}}",
+                "description": "Maps to `DELETE /api/Orders/{orderID}`."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Products (proxied)",
+          "item": [
+            {
+              "name": "Get product by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{gatewayUrl}}/gateway/Product/{{productId}}",
+                "description": "Matches order-service client: `GET /api/Product/{productID}`. Add more requests under this folder for your product API."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Users (proxied)",
+          "item": [
+            {
+              "name": "Get user by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{gatewayUrl}}/gateway/Users/{{userId}}",
+                "description": "Matches order-service client: `GET /api/Users/{userId}`. Add more requests for your user API."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Orders service (direct)",
+      "item": [
+        {
+          "name": "Root ping",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{ordersServiceUrl}}/",
+            "description": "`MapGet(\"/\", ...)` — not exposed through the gateway."
+          }
+        },
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{ordersServiceUrl}}/swagger",
+            "description": "Open in browser for interactive docs."
+          }
+        },
+        {
+          "name": "OpenAPI document",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{ordersServiceUrl}}/swagger/v1/swagger.json",
+            "description": "Machine-readable OpenAPI for the order service."
+          }
+        },
+        {
+          "name": "Get all orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{ordersServiceUrl}}/api/Orders"
+          }
+        },
+        {
+          "name": "Get order by order ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{ordersServiceUrl}}/api/Orders/search/orderid/{{orderId}}"
+          }
+        },
+        {
+          "name": "Get orders by product ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{ordersServiceUrl}}/api/Orders/search/productid/{{productId}}"
+          }
+        },
+        {
+          "name": "Get orders by user ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{ordersServiceUrl}}/api/Orders/search/userid/{{userId}}"
+          }
+        },
+        {
+          "name": "Get orders by order date",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{ordersServiceUrl}}/api/Orders/search/orderDate/{{orderDate}}"
+          }
+        },
+        {
+          "name": "Create order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userID\": \"{{userId}}\",\n  \"orderDate\": \"2026-04-12T10:00:00Z\",\n  \"orderItems\": [\n    {\n      \"productID\": \"{{productId}}\",\n      \"unitPrice\": 19.99,\n      \"quantity\": 1\n    }\n  ]\n}\n"
+            },
+            "url": "{{ordersServiceUrl}}/api/Orders"
+          }
+        },
+        {
+          "name": "Update order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderID\": \"{{orderId}}\",\n  \"userID\": \"{{userId}}\",\n  \"orderDate\": \"2026-04-12T10:00:00Z\",\n  \"orderItems\": [\n    {\n      \"productID\": \"{{productId}}\",\n      \"unitPrice\": 19.99,\n      \"quantity\": 2\n    }\n  ]\n}\n"
+            },
+            "url": "{{ordersServiceUrl}}/api/Orders/{{orderId}}"
+          }
+        },
+        {
+          "name": "Delete order",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{ordersServiceUrl}}/api/Orders/{{orderId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Product service (direct)",
+      "item": [
+        {
+          "name": "Get product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{productsServiceUrl}}/api/Product/{{productId}}",
+            "description": "Same path the order service uses internally. Add CRUD/list calls here to match your deployed image."
+          }
+        }
+      ]
+    },
+    {
+      "name": "User service (direct)",
+      "item": [
+        {
+          "name": "Get user by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{usersServiceUrl}}/api/Users/{{userId}}",
+            "description": "Same path the order service uses internally."
+          }
+        }
+      ]
+    }
+  ]
+}
